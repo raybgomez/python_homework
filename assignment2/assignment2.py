@@ -120,4 +120,64 @@ print(custom_module.secret)
 
 #Task 12
 
+def read_minutes():
+
+    files = ["../csv/minutes1.csv", "../csv/minutes2.csv"]
+    minutes_dicts = {
+        f"minutes{i+1}": {"fields": None, "rows": []}
+        for i in range(len(files))
+    }
+    try:
+        for i, file_path in enumerate(files):
+            with open(file_path, newline='', encoding='utf-8') as csvfile:
+                reader = csv.reader(csvfile)
+                fields = next(reader)
+                rows = [tuple(row) for row in reader]
+                minutes_dicts[f'minutes{i+1}'] = {'fields': fields, 'rows':rows}
+
+    except Exception as e: 
+        print(f'An error occurred: {e}')
+    
+    return minutes_dicts['minutes1'], minutes_dicts['minutes2']
+
+minutes1, minutes2 = read_minutes()
+
+# Task 13
+
+def create_minutes_set():
+
+    set1 = set(minutes1['rows'])
+    set2 = set(minutes2['rows'])
+
+
+    return set1.union(set2)
+
+minutes_set = create_minutes_set()
+
+#Task 14
+
+from datetime import datetime
+
+def create_minutes_list():
+    minutes_list = list(map(lambda x: (x[0], datetime.strptime(x[1], "%B %d, %Y")), minutes_set))
+    return minutes_list
+
+minutes_list = create_minutes_list()
+
+#Task 15
+
+def write_sorted_list():
+    global minutes_list
+
+    minutes_list.sort(key=lambda x: x[1])
+    formatted_list = list(map(lambda x: (x[0], x[1].strftime("%B %d, %Y")), minutes_list))
+
+    with open("./minutes.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(minutes1['fields'])
+        writer.writerows(formatted_list)
+
+    return formatted_list
+
+sorted_minutes = write_sorted_list()
 
